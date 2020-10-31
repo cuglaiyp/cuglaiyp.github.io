@@ -495,8 +495,7 @@
 </table>
 
 <p>看完了操作，我们来看一下Stream体系的组织架构。</p>
-<h2 id="Stream架构"><a href="#Stream架构" class="headerlink" title="Stream架构"></a>Stream架构</h2><img src="java.util.stream/Stream%E6%9E%B6%E6%9E%84.png" class="lazyload" data-srcset="java.util.stream/Stream%E6%9E%B6%E6%9E%84.png" srcset="data:image/png;base64,666" style="zoom:60%;" />
-
+<h2 id="Stream架构"><a href="#Stream架构" class="headerlink" title="Stream架构"></a>Stream架构</h2><p><img src="java.util.stream/Stream%E6%9E%B6%E6%9E%84.png" class="lazyload" data-srcset="java.util.stream/Stream%E6%9E%B6%E6%9E%84.png" srcset="data:image/png;base64,666" alt="Lena"></p>
 <p>上面表格里面的方法，基本上都是在ReferencePipeline这个类里面实现的</p>
 <p>接着，我们根据上面的流应用的例子结合源码来看一下每一步干了什么事，生成了什么对象（注意结合体系架构图看，更清晰）。</p>
 <p>首先是：</p>
@@ -549,7 +548,7 @@
 
 <p>到这里，其实有一个疑问：为什么每一个stage已经包含了操作，而且stage也是双向链表连接起来了，不直接使用stage处理完，调用下一个stage的处理呢？这是因为每一个stage的操作都是不一样的，比如map方法返回的stage，就只用lambda遍历每一个元素进行相应的处理就好，而sort方法返回的stage需要先new一个数组，然后把每一个元素填入到数组中，然后再调用数组排序。这样每一个stage的涉及到的操作和方法并不一样，调用起来很复杂。为了能很好的完成上下游之间联动，就抽象出了三个模版方法。上游只需要在合适的时机按顺序调用下游的三个模版方法就好了（因为每一个sink都有这三个方法，上游知道下游必定有这三个方法，放心调用就完事了）。</p>
 <p>上面说了这么多，流操作的基本流程已经理清楚了，下面一图以蔽之：</p>
-<img src="java.util.stream/stream%E6%B5%81%E7%A8%8B%E5%9B%BE.png" class="lazyload" data-srcset="java.util.stream/stream%E6%B5%81%E7%A8%8B%E5%9B%BE.png" srcset="data:image/png;base64,666" style="zoom:50%;" />
+<img src="java.util.stream/stream%E6%B5%81%E7%A8%8B%E5%9B%BE.png" class="lazyload" data-srcset="java.util.stream/stream%E6%B5%81%E7%A8%8B%E5%9B%BE.png" srcset="data:image/png;base64,666" alt="Lena" style="zoom:50%;" />
 
 <p><strong>补</strong>：补一个流的代码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 好好研究这个代码，很有价值</span><br><span class="line">Arrays.stream(nums)</span><br><span class="line">    .boxed()</span><br><span class="line">    .map(e -&gt; e.toString())</span><br><span class="line">    .sorted((e1, e2) -&gt; &#123;</span><br><span class="line">        String s1 &#x3D; e1 + e2;</span><br><span class="line">        String s2 &#x3D; e2 + e1;</span><br><span class="line">        for(int i &#x3D; 0; i &lt; s1.length(); i++)&#123;</span><br><span class="line">            if(s1.charAt(i) - s2.charAt(i) &gt; 0) return -1;</span><br><span class="line">            else if(s1.charAt(i) - s2.charAt(i) &lt; 0) return 1;</span><br><span class="line">        &#125;</span><br><span class="line">        return 0;</span><br><span class="line">    &#125;)</span><br><span class="line">    .reduce(String::concat) &#x2F;&#x2F;这里流已经消费完了，下面的filter方法是这个方法返回的Optional类的方法，不要混淆</span><br><span class="line">    .filter(e -&gt; !e.startsWith(&quot;0&quot;))</span><br><span class="line">    .orElse(&quot;0&quot;);</span><br></pre></td></tr></table></figure>
@@ -606,7 +605,7 @@
     <div class='new-meta-box'>
       
         
-          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-10-31T15:09:04+08:00">
+          <div class="new-meta-item date" itemprop="dateUpdated" datetime="2020-10-31T15:23:26+08:00">
   <a class='notlink'>
     <i class="fas fa-edit fa-fw" aria-hidden="true"></i>
     <p>更新于：2020年10月31日</p>
